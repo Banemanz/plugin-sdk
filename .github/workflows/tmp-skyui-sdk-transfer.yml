@@ -16,20 +16,10 @@ jobs:
           ref: 624a6a49265fd7a6fc63bda1611013ceabeacb8a
           path: sdk
           submodules: recursive
-      - name: Checkout transfer branch
-        uses: actions/checkout@v4
+      - name: Package
+        run: tar -cJf plugin-sdk-2025-10-25.tar.xz sdk
+      - name: Upload transfer artifact
+        uses: actions/upload-artifact@v4
         with:
-          repository: Banemanz/plugin-sdk
-          ref: tmp/skyui-sdk-transfer-20260923
-          path: transfer
-          token: ${{ github.token }}
-      - name: Package and publish as text
-        run: |
-          tar -cJf plugin-sdk-2025-10-25.tar.xz sdk
-          base64 -w 0 plugin-sdk-2025-10-25.tar.xz > transfer/plugin-sdk-2025-10-25.tar.xz.b64
-          cd transfer
-          git config user.name "SkyUI temp transfer"
-          git config user.email "actions@users.noreply.github.com"
-          git add plugin-sdk-2025-10-25.tar.xz.b64
-          git commit -m "temp: SDK source payload [skip ci]"
-          git push origin HEAD:tmp/skyui-sdk-transfer-20260923
+          name: plugin-sdk-2025-10-25-source
+          path: plugin-sdk-2025-10-25.tar.xz
