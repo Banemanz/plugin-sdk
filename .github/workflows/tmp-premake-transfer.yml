@@ -1,0 +1,21 @@
+name: Temp Premake Transfer
+on:
+  push:
+    branches:
+      - tmp/skyui-sdk-transfer-20260923
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install premake5
+        uses: Jarod42/install-premake5@v7
+      - name: Copy binary
+        run: |
+          mkdir out
+          cp "$(command -v premake5)" out/premake5
+          chmod +x out/premake5
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: premake5-linux
+          path: out/premake5
