@@ -9,18 +9,27 @@ jobs:
   package:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout exact snapshot
+      - name: Checkout exact SDK snapshot
         uses: actions/checkout@v4
         with:
           repository: DK22Pac/plugin-sdk
           ref: 624a6a49265fd7a6fc63bda1611013ceabeacb8a
           path: sdk
           submodules: recursive
-      - name: Package
-        run: tar -cJf plugin-sdk-2025-10-25.tar.xz sdk
-      - name: Publish temp release
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Checkout transfer branch
+        uses: actions/checkout@v4
+        with:
+          repository: Banemanz/plugin-sdk
+          ref: tmp/skyui-sdk-transfer-20260923
+          path: transfer
+          token: ${{ github.token }}
+      - name: Package and publish as text
         run: |
-          gh release delete temp-skyui-sdk-20260923 --repo ${{ github.repository }} --yes || true
-          gh release create temp-skyui-sdk-20260923 plugin-sdk-2025-10-25.tar.xz --repo ${{ github.repository }} --title "Temporary SkyUI SDK transfer" --notes "Temporary source transfer for local build"
+          tar -cJf plugin-sdk-2025-10-25.tar.xz sdk
+          base64 -w 0 plugin-sdk-2025-10-25.tar.xz > transfer/plugin-sdk-2025-10-25.tar.xz.b64
+          cd transfer
+          git config user.name "SkyUI temp transfer"
+          git config user.email "actions@users.noreply.github.com"
+          git add plugin-sdk-2025-10-25.tar.xz.b64
+          git commit -m "temp: SDK source payload [skip ci]"
+          git push origin HEAD:tmp/skyui-sdk-transfer-20260923
